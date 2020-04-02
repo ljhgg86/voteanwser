@@ -1,0 +1,14 @@
+php artisan make:scaffold Vote --schema="
+poll_id:integer:unsigned:index:comment('投票ID'),
+title:string:index:comment('投票标题'),
+thumbnail:string:nullable:comment('投票缩略图'),
+start_at:datetime:comment('开始时间'),
+end_at:datetime:nullable:comment('结束时间'),
+view_end_at:datetime:nullable:comment('结束后观看结果时间'),
+option_count:integer:unsigned:default(1):comment('选项个数'),
+option_type:integer:unsigned:default(1):comment('1单选 2多选'),
+vote_type:integer:unsigned:default(1):comment('投票类型1题目 2投票'),
+vote_count:integer:unsigned:default(0):comment('投票人数'),
+show_votecount:boolean:default(true):comment('显示参加人数标志'),
+description:text:nullable:comment('描述'),
+delflag:boolean:default(false):comment('删除标志')"
