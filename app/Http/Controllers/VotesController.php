@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\InputAnswerEvent;
 use App\Events\UserVotedEvent;
+use App\Events\UserPollEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VoteRequest;
 use App\Http\Resources\VoteResource;
@@ -388,6 +389,83 @@ class VotesController extends Controller {
 				'successflag' => true,
 			],
 			'message' => '答案输入成功',
+		])->setStatusCode(200);
+	}
+
+	public function voteds(VoteRequest $request, Poll $poll){
+		$user = $request->user();
+
+		if (!$user) {
+			return response()->json([
+				'status' => false,
+				'data' => [
+					'successflag' => false,
+				],
+				'message' => '用户未登录',
+			])->setStatusCode(400);
+		}
+
+		if (!$request->has('choices')) {
+			return response()->json([
+				'status' => false,
+				'data' => [
+					'successflag' => false,
+				],
+				'message' => '用户选择了错误选项',
+			])->setStatusCode(400);
+		}
+		$choices = $request->get('choices');
+		$vote0 = Vote::find($choices[0]->vote_id);
+		if (!($vote0->canVote)) {
+			return response()->json([
+				'status' => false,
+				'data' => [
+					'successflag' => false,
+				],
+				'message' => '活动已关闭',
+			])->setStatusCode(400);
+		}
+		$correctNum = 0;
+		foreach($choices as $choice){
+			$vote_id = $choice->vote_id;
+			$vote = Vote::find($vote_id);
+			$options = collect(json_decode($choice->options));
+			if ($options->isEmpty()) {
+				continue;
+			}
+			$ids = $options->filter(function ($option) {
+				return $option->selected;
+			})->map(function ($option) {
+				return $option->option_id;
+			})->toArray();
+			foreach ($ids as $id) {
+				$correct = false;
+				$answer = Answer::where('option_id', $id)->where('vote_id', $vote_id)->first();
+				if ($answer) {
+					$correct = true;
+				}
+				$user->options()->attach($id, ['vote_id' => $vote->id, 'correct' => $correct]);
+				$option = Option::find($id);
+				$option->increment('vote_count');
+			}
+			$vote->increment('vote_count');
+			$answer_ids = Answer::where('vote_id', $vote_id)->get()->pluck('option_id');
+			if($answer_ids->diff($ids)>isEmpty()){
+				++$correctNum;
+			}
+		}
+		if($correctNum){
+			Event(new UserPollEvent($poll, $user, $correctNum));
+		}
+		$poll->increment('vote_count');
+		$voteCounts = count($poll->load('votes')->votes);
+		return response()->json([
+			'status' => true,
+			'data' => [
+				'correctNum' => $correctNum,
+				'failNum' => $voteCounts-$correctNum,
+			],
+			'message' => '提交成功',
 		])->setStatusCode(200);
 	}
 }

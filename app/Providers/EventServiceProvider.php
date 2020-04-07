@@ -25,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\RegenerateRankinglistEvent' => [
             'App\Listeners\RegenerateRankinglistEventListener',
         ],
+        'App\Events\UserPollEvent' => [
+            'App\Listeners\UserPollEventListener',
+        ],
     ];
 
     /**
