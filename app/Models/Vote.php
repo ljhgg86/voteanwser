@@ -60,21 +60,24 @@ class Vote extends Model
         return $this->belongsToMany(Option::class, 'answers', 'vote_id', 'option_id')->withTimestamps();
     }
 
-    public function handleVotes($choices){
+    public function handleVotes($choices){dump("hh");
         $user=request()->user();
         $correctNum = 0;
-		foreach($choices as $choice){
-			$vote_id = $choice->vote_id;
-			$vote = Vote::find($vote_id);
-			$options = collect(json_decode($choice->options));
+        dump($user);
+		foreach($choices as $choice){dump($choice);
+			$vote_id = $choice['vote_id'];
+            $vote = Vote::find($vote_id);
+            dump($choice['options']);
+			$options = collect($choice['options']);
 			if ($options->isEmpty()) {
 				continue;
 			}
-			$ids = $options->filter(function ($option) {
-				return $option->selected;
+			$ids = $options->filter(function ($option) {dump($option);
+				return $option['selected'];
 			})->map(function ($option) {
-				return $option->option_id;
-			})->toArray();
+				return $option['option_id'];
+            })->toArray();
+            dump($ids);
 			foreach ($ids as $id) {
 				$correct = false;
 				$answer = Answer::where('option_id', $id)->where('vote_id', $vote_id)->first();
@@ -86,8 +89,11 @@ class Vote extends Model
 				$option->increment('vote_count');
 			}
 			$vote->increment('vote_count');
-			$answer_ids = Answer::where('vote_id', $vote_id)->get()->pluck('option_id');
-			if($answer_ids->diff($ids)>isEmpty()){
+            $answer_ids = Answer::where('vote_id', $vote_id)->get()->pluck('option_id');
+            dump(collect($ids));
+            dump($answer_ids);
+            dump($answer_ids->diff($ids));
+			if($answer_ids->diff(collect($ids))->isEmpty()){
 				++$correctNum;
 			}
         }

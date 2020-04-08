@@ -18,6 +18,7 @@ use Carbon\Carbon;
 class VotesController extends Controller {
 	public function __construct() {
 		//$this->middleware('auth', ['except' => ['index', 'show']]);
+		$this->vote = new Vote();
 	}
 
 	public function index(Poll $poll) {
@@ -415,7 +416,9 @@ class VotesController extends Controller {
 			])->setStatusCode(400);
 		}
 		$choices = $request->get('choices');
-		$vote0 = Vote::find($choices[0]->vote_id);
+		dump($choices[0]);
+		$vote0 = Vote::find($choices[0]['vote_id']);
+		dump($vote0);
 		if (!($vote0->canVote)) {
 			return response()->json([
 				'status' => false,
@@ -425,7 +428,8 @@ class VotesController extends Controller {
 				'message' => '活动已关闭',
 			])->setStatusCode(400);
 		}
-		$correctNum = Vote::handleVotes($choices);
+		$correctNum = $this->vote->handleVotes($choices);
+		dump($correctNum);
 		if($correctNum){
 			Event(new UserPollEvent($poll, $user, $correctNum));
 		}
