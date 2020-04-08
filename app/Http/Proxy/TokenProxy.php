@@ -40,7 +40,6 @@ class TokenProxy {
                 'scope'    => '',
             ]);
         }
-
         return response()->json([
             'status'  => false,
             'data'=>[
@@ -105,11 +104,11 @@ class TokenProxy {
             'client_secret' => env('PASSPORT_CLIENT_SECRET'),
             'grant_type'    => $grantType,
         ]);
-
+            
         $response = $this->http->post(env('APP_URL').'/oauth/token', [
             'form_params' => $data,
         ]);
-
+           
         $token = json_decode((string)$response->getBody(), true);
 
         return response()->json([

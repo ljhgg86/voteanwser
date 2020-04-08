@@ -425,35 +425,7 @@ class VotesController extends Controller {
 				'message' => '活动已关闭',
 			])->setStatusCode(400);
 		}
-		$correctNum = 0;
-		foreach($choices as $choice){
-			$vote_id = $choice->vote_id;
-			$vote = Vote::find($vote_id);
-			$options = collect(json_decode($choice->options));
-			if ($options->isEmpty()) {
-				continue;
-			}
-			$ids = $options->filter(function ($option) {
-				return $option->selected;
-			})->map(function ($option) {
-				return $option->option_id;
-			})->toArray();
-			foreach ($ids as $id) {
-				$correct = false;
-				$answer = Answer::where('option_id', $id)->where('vote_id', $vote_id)->first();
-				if ($answer) {
-					$correct = true;
-				}
-				$user->options()->attach($id, ['vote_id' => $vote->id, 'correct' => $correct]);
-				$option = Option::find($id);
-				$option->increment('vote_count');
-			}
-			$vote->increment('vote_count');
-			$answer_ids = Answer::where('vote_id', $vote_id)->get()->pluck('option_id');
-			if($answer_ids->diff($ids)>isEmpty()){
-				++$correctNum;
-			}
-		}
+		$correctNum = Vote::handleVotes($choices);
 		if($correctNum){
 			Event(new UserPollEvent($poll, $user, $correctNum));
 		}

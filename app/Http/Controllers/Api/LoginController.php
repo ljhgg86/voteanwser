@@ -48,32 +48,32 @@ class LoginController extends Controller
                         ->where('verification_code', request('password'))
                         ->orderBy('id','desc')
                         ->first();
+        //dump("a1");
+        // if (!$sms) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'data'=>[
+        //             'successflag' => false
+        //         ],
+        //         'message' => '短信验证码错误！',
+        //     ])->setStatusCode(400);
+        // }
 
-        if (!$sms) {
-            return response()->json([
-                'status' => false,
-                'data'=>[
-                    'successflag' => false
-                ],
-                'message' => '短信验证码错误！',
-            ])->setStatusCode(400);
-        }
+        //$current=now();
 
-        $current=now();
+        // if ($sms->expired_at<now()) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'data'=>[
+        //             'successflag' => false,
+        //             'expired_at' => $sms->expired_at,
+        //             'now' => $current
 
-        if ($sms->expired_at<now()) {
-            return response()->json([
-                'status' => false,
-                'data'=>[
-                    'successflag' => false,
-                    'expired_at' => $sms->expired_at,
-                    'now' => $current
-
-                ],
-                'message' => '短信验证码已过期！',
-            ])->setStatusCode(400);
-        }
-
+        //         ],
+        //         'message' => '短信验证码已过期！',
+        //     ])->setStatusCode(400);
+        // }
+        //dump("ddd");
         return $this->proxy->login(request('name'), request('password'), request('inviterid'));//add request inviter by 0.618
     }
 

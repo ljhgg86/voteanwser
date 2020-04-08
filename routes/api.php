@@ -96,6 +96,9 @@ Route::prefix('v2')->group(function () {
     Route::post('/votes/{vote}/answer', 'VotesController@answer')->middleware('auth:api');
     Route::post('/votes/{vote}/options/bat_save', 'OptionsController@batSave')->middleware('auth:api');
 
+    //add by 0.618 for votes
+    Route::post('/votes/{poll}/uservoteds', 'VotesController@voteds')->middleware('auth:api');
+
     //voteInfo 路由
     Route::get('/votes/{vote}/voteInfos','VoteInfosController@index');
     Route::get('/admin/votes/{vote}/voteInfos','VoteInfosController@voteInfos')->middleware('auth:api');
