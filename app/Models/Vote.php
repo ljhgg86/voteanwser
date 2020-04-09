@@ -91,7 +91,7 @@ class Vote extends Model
 			}
 			$vote->increment('vote_count');
             $answer_ids = Answer::where('vote_id', $vote_id)->get()->pluck('option_id');
-			if($answer_ids->diff(collect($ids))->isEmpty()){
+			if($answer_ids->diff(collect($ids))->isEmpty() && collect($ids)->diff($answer_ids)->isEmpty()){
 				++$correctNum;
 			}
         }
