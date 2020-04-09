@@ -67,7 +67,7 @@ class Vote extends Model
     public function handleVotes($choices){
         $user=request()->user();
         $correctNum = 0;
-		foreach($choices as $choice){dump($choice);
+		foreach($choices as $choice){
 			$vote_id = $choice['vote_id'];
             $vote = Vote::find($vote_id);
 			$options = collect($choice['options']);

@@ -417,7 +417,7 @@ class VotesController extends Controller {
 		}
 		$choices = $request->get('choices');
 		$vote0 = Vote::find($choices[0]['vote_id']);
-		dump($vote0->canView);
+		
 		if (!($vote0->canView)) {
 			return response()->json([
 				'status' => false,
@@ -437,7 +437,7 @@ class VotesController extends Controller {
 			'status' => true,
 			'data' => [
 				'correctNum' => $correctNum,
-				'failNum' => $voteCounts-$correctNum,
+				'wrongNum' => $voteCounts-$correctNum,
 			],
 			'message' => '提交成功',
 		])->setStatusCode(200);
