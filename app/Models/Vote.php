@@ -60,24 +60,25 @@ class Vote extends Model
         return $this->belongsToMany(Option::class, 'answers', 'vote_id', 'option_id')->withTimestamps();
     }
 
-    public function handleVotes($choices){dump("hh");
+    public function getCanViewAttribute(){
+        return $this->view_end_at >= Carbon::now();
+    }
+
+    public function handleVotes($choices){
         $user=request()->user();
         $correctNum = 0;
-        dump($user);
 		foreach($choices as $choice){dump($choice);
 			$vote_id = $choice['vote_id'];
             $vote = Vote::find($vote_id);
-            dump($choice['options']);
 			$options = collect($choice['options']);
 			if ($options->isEmpty()) {
 				continue;
 			}
-			$ids = $options->filter(function ($option) {dump($option);
+			$ids = $options->filter(function ($option) {
 				return $option['selected'];
 			})->map(function ($option) {
 				return $option['option_id'];
             })->toArray();
-            dump($ids);
 			foreach ($ids as $id) {
 				$correct = false;
 				$answer = Answer::where('option_id', $id)->where('vote_id', $vote_id)->first();
@@ -90,9 +91,6 @@ class Vote extends Model
 			}
 			$vote->increment('vote_count');
             $answer_ids = Answer::where('vote_id', $vote_id)->get()->pluck('option_id');
-            dump(collect($ids));
-            dump($answer_ids);
-            dump($answer_ids->diff($ids));
 			if($answer_ids->diff(collect($ids))->isEmpty()){
 				++$correctNum;
 			}

@@ -416,10 +416,9 @@ class VotesController extends Controller {
 			])->setStatusCode(400);
 		}
 		$choices = $request->get('choices');
-		dump($choices[0]);
 		$vote0 = Vote::find($choices[0]['vote_id']);
-		dump($vote0);
-		if (!($vote0->canVote)) {
+		dump($vote0->canView);
+		if (!($vote0->canView)) {
 			return response()->json([
 				'status' => false,
 				'data' => [
@@ -429,7 +428,6 @@ class VotesController extends Controller {
 			])->setStatusCode(400);
 		}
 		$correctNum = $this->vote->handleVotes($choices);
-		dump($correctNum);
 		if($correctNum){
 			Event(new UserPollEvent($poll, $user, $correctNum));
 		}
