@@ -12,6 +12,7 @@ use App\Models\Option;
 use App\Models\Answer;
 use App\Models\User;
 use App\Models\UserVote;
+use App\Models\Rankinglist;
 use App\Http\Requests\RewardRequest;
 
 class RewardsController extends Controller
@@ -199,5 +200,62 @@ class RewardsController extends Controller
         3.随机抽出指定数量的用户
         */
 
+    }
+    public function rewards(RewardRequest $request, Reward $reward){
+        $this->authorize();
+        $reward_type = $request->reward_type;
+        $reward_count = $request->reward_count;
+        if (($reward_type) && ($reward_count>0)) {
+            //获得输入，保存rewardLog
+            $reward_log = RewardLog::make($request->all());
+            $reward_log->user_id = $request->user()->id;
+            $reward->rewardLogs()->save($reward_log);
+        } else {
+            return response()->json([
+                'status' => false,
+                'data'=>[],
+                'message' => '输入参数错误，请重新输入',
+            ])->setStatusCode(400);
+        }
+         //获取rewardrecord
+         $rewardRecords = RewardRecord::where('reward_id', $reward->id)->where('reward_type', $reward_type)->get();
+         if ($rewardRecords->isNotEmpty()) {
+             return response()->json([
+                 'status' => false,
+                 'data'=>[],
+                 'message' => '该奖项抽奖数据已存在，请重新输入',
+             ])->setStatusCode(400);
+         }
+         //获取已获奖的user_id
+        $redeem_user_ids = RewardRecord::where('reward_id', $reward->id)->get()->pluck('user_id');
+
+        //获取rewarditem
+        $poll_id = RewardItem::where('reward_id', $reward->id)->first()->poll_id;
+        $vote_user_ids = Rankinglist::where('poll_id', $poll_id)
+                                    ->whereNotIn('user_id', $redeem_user_ids)
+                                    ->where('correct_num','>=',$reward->condition)
+                                    ->get()
+                                    ->pluck('user_id');
+        if($vote_user_ids>isEmpty()){
+            return response()->json([
+                'status'=>false,
+                'data'=>[],
+                'message'=>"没有符合条件的用户"
+            ])->setStatusCode(400);
+        }
+        $reedem_ids = $vote_user_ids->count() > $reward_count ? $vote_user_ids->random($reward_count) : $vote_user_ids;
+
+        $reedem_ids->each(function($reedem_id) use ($reward, $reward_type) {
+            RewardRecord::create([
+                'reward_id'=>$reward->id,
+                'user_id'=>$reedem_id,
+                'reward_type'=>$reward_type,
+            ]);
+        });
+        return response()->json([
+                'status' => true,
+                'data'=>[],
+                'message' => '该奖项抽奖成功',
+            ])->setStatusCode(200);
     }
 }

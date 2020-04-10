@@ -119,6 +119,7 @@ Route::prefix('v2')->group(function () {
     Route::post('/rewards/{reward}/destroy', 'RewardsController@destroy')->middleware('auth:api');
     //根据输入条件抽奖
     Route::post('/rewards/{reward}/reward', 'RewardsController@reward')->middleware('auth:api');
+    Route::post('/rewards/{reward}/rewards', 'RewardsController@rewards')->middleware('auth:api');
 
     //rewardItem 路由
     Route::get('/rewards/{reward}/rewardItems','RewardItemsController@index')->middleware('auth:api');
