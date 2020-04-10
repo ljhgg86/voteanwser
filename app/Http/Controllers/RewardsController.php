@@ -236,7 +236,7 @@ class RewardsController extends Controller
                                     ->where('correct_num','>=',$reward->condition)
                                     ->get()
                                     ->pluck('user_id');
-        if($vote_user_ids>isEmpty()){
+        if($vote_user_ids->isEmpty()){
             return response()->json([
                 'status'=>false,
                 'data'=>[],
