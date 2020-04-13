@@ -226,11 +226,17 @@ class RewardsController extends Controller
                  'message' => '该奖项抽奖数据已存在，请重新输入',
              ])->setStatusCode(400);
          }
-         //获取已获奖的user_id
-        $redeem_user_ids = RewardRecord::where('reward_id', $reward->id)->get()->pluck('user_id');
 
-        //获取rewarditem
+         //获取poll_id
         $poll_id = RewardItem::where('reward_id', $reward->id)->first()->poll_id;
+
+        //获取poll_id对应的所有reward_id
+        $reward_ids = RewardItem::where('poll_id', $poll_id)->get()->pluck('reward_id');
+
+         //获取已获奖的user_id
+        //$redeem_user_ids = RewardRecord::where('reward_id', $reward->id)->get()->pluck('user_id');
+        $redeem_user_ids = RewardRecord::whereIn('reward_id', $reward_ids)->get()->pluck('user_id');
+        
         $vote_user_ids = Rankinglist::where('poll_id', $poll_id)
                                     ->whereNotIn('user_id', $redeem_user_ids)
                                     ->where('correct_num','>=',$reward->condition)
