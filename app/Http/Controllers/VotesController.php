@@ -109,6 +109,8 @@ class VotesController extends Controller {
 			->where('end_at', '>=', $currentTime)
 			->orderBy('id', 'asc')
 			->with('poll', 'options', 'voteInfos')
+			//->inRandomOrder()
+			//->take(2)
 			->get();
 
 		if ($votes->isEmpty()) {
