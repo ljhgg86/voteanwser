@@ -44,7 +44,7 @@ class PollsController extends Controller {
 		return response()->json([
 			'status' => true,
 			'data' => PollResource::collection($polls),
-			'beginDate' => '2020/04/20 00:00:01',
+			'beginDate' => '2020/05/11 00:00:01',
 			'message' => '成功',
 		])->setStatusCode(200);
 	}

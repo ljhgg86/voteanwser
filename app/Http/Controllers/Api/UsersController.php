@@ -101,6 +101,9 @@ class UsersController extends Controller
         if ($request->has('user_avatar')) {
             $user->user_avatar=$request->user_avatar;
         }
+        if($request->has('address')){
+            $user->address = $request->address;
+        }
 
         $user->save();
 
