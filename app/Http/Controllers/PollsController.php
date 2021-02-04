@@ -18,13 +18,29 @@ class PollsController extends Controller {
 	}
 
 	public function index(Request $request) {
-		$polls = Poll::where('id', '<', $request->min_id)
+		$flagTime = strtotime("2021-02-17");
+		$currentTime = strtotime(date('Y-m-d'));
+		$diffDays = ($flagTime - $currentTime)/(24*3600);
+		
+		if($diffDays > 0){
+			$polls = Poll::where('id', '<', $request->min_id)
+			->where('delflag', false)
+			->where('verifyflag', true)
+			->orderBy('id', 'desc')
+			->skip($diffDays)
+			->take($request->listcount)
+			->get();
+		//->with('votes','votes.options')->get();
+		}
+		else{
+			$polls = Poll::where('id', '<', $request->min_id)
 			->where('delflag', false)
 			->where('verifyflag', true)
 			->orderBy('id', 'desc')
 			->take($request->listcount)
 			->get();
 		//->with('votes','votes.options')->get();
+		}
 
 		if ($polls->count() == 0) {
 			return response()->json([
@@ -44,7 +60,7 @@ class PollsController extends Controller {
 		return response()->json([
 			'status' => true,
 			'data' => PollResource::collection($polls),
-			'beginDate' => '2020/05/11 00:00:01',
+			'beginDate' => '2021/02/01 00:00:01',
 			'message' => '成功',
 		])->setStatusCode(200);
 	}
