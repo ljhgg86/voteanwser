@@ -249,6 +249,10 @@ class RewardsController extends Controller
                 'message'=>"没有符合条件的用户"
             ])->setStatusCode(400);
         }
+
+        //$user_ids = User::whereNotNull('adress')->get(['id']);
+        //$vote_user_ids = $vote_user_ids->intersect($user_ids);
+
         $reedem_ids = $vote_user_ids->count() > $reward_count ? $vote_user_ids->random($reward_count) : $vote_user_ids;
 
         $reedem_ids->each(function($reedem_id) use ($reward, $reward_type) {
