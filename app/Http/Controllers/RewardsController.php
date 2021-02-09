@@ -250,8 +250,10 @@ class RewardsController extends Controller
             ])->setStatusCode(400);
         }
 
-        //$user_ids = User::whereNotNull('adress')->get(['id']);
-        //$vote_user_ids = $vote_user_ids->intersect($user_ids);
+        //for 亚青
+        $user_ids = User::whereNotNull('adress')->get(['id']);
+        $vote_user_ids = $vote_user_ids->intersect($user_ids);
+        //for 亚青
 
         $reedem_ids = $vote_user_ids->count() > $reward_count ? $vote_user_ids->random($reward_count) : $vote_user_ids;
 
