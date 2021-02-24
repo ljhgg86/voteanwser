@@ -238,21 +238,21 @@ class RewardsController extends Controller
         $redeem_user_ids = RewardRecord::whereIn('reward_id', $reward_ids)->get()->pluck('user_id');
  
         //for亚青start,新增只找地址不为空的
-        $user_ids = User::whereNotNull('address')->get()->pluck('id');
+        // $user_ids = User::whereNotNull('address')->get()->pluck('id');
        
-        $vote_user_ids = Rankinglist::where('poll_id', $poll_id)
-                                    ->whereNotIn('user_id', $redeem_user_ids)
-                                    ->whereIn('user_id', $user_ids)
-                                    ->where('correct_num','>=',$reward->condition)
-                                    ->get()
-                                    ->pluck('user_id');
-         //for亚青end
-
         // $vote_user_ids = Rankinglist::where('poll_id', $poll_id)
         //                             ->whereNotIn('user_id', $redeem_user_ids)
+        //                             ->whereIn('user_id', $user_ids)
         //                             ->where('correct_num','>=',$reward->condition)
         //                             ->get()
         //                             ->pluck('user_id');
+         //for亚青end
+
+        $vote_user_ids = Rankinglist::where('poll_id', $poll_id)
+                                    ->whereNotIn('user_id', $redeem_user_ids)
+                                    ->where('correct_num','>=',$reward->condition)
+                                    ->get()
+                                    ->pluck('user_id');
         if($vote_user_ids->isEmpty()){
             return response()->json([
                 'status'=>false,
