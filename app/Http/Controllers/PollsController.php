@@ -18,21 +18,21 @@ class PollsController extends Controller {
 	}
 
 	public function index(Request $request) {
-		// $flagTime = strtotime("2021-02-17");
-		// $currentTime = strtotime(date('Y-m-d'));
-		// $diffDays = ($flagTime - $currentTime)/(24*3600);
+		$flagTime = strtotime("2021-05-13");
+		$currentTime = strtotime(date('Y-m-d'));
+		$diffDays = ($flagTime - $currentTime)/(24*3600);
 		
-		// if($diffDays > 0){
-		// 	$polls = Poll::where('id', '<', $request->min_id)
-		// 	->where('delflag', false)
-		// 	->where('verifyflag', true)
-		// 	->orderBy('id', 'desc')
-		// 	->skip($diffDays)
-		// 	->take($request->listcount)
-		// 	->get();
+		if($diffDays > 0){
+			$polls = Poll::where('id', '<', $request->min_id)
+			->where('delflag', false)
+			->where('verifyflag', true)
+			->orderBy('id', 'desc')
+			->skip($diffDays)
+			->take($request->listcount)
+			->get();
 		 //->with('votes','votes.options')->get();
-		// }
-		//else{
+		}
+		else{
 			$polls = Poll::where('id', '<', $request->min_id)
 			->where('delflag', false)
 			->where('verifyflag', true)
@@ -40,7 +40,7 @@ class PollsController extends Controller {
 			->take($request->listcount)
 			->get();
 		//->with('votes','votes.options')->get();
-		//}
+		}
 
 		if ($polls->count() == 0) {
 			return response()->json([
