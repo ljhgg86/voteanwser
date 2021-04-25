@@ -18,7 +18,7 @@ class PollsController extends Controller {
 	}
 
 	public function index(Request $request) {
-		$flagTime = strtotime("2021-05-12");
+		$flagTime = strtotime("2021-04-27");
 		$currentTime = strtotime(date('Y-m-d'));
 		$diffDays = ($flagTime - $currentTime)/(24*3600);
 		
